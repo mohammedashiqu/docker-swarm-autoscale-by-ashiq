@@ -1,0 +1,34 @@
+# Download the Stack File (from GitHub)
+curl -L https://git.io/JcGlt -o visualizer.stack.yml
+
+# Deploy the Stack
+docker stack deploy -c visualizer.stack.yml visualizer
+
+
+
+tools.stack.yml
+----------------
+version: '3.9'
+
+services:
+  server:
+    image: yandeu/dev-tools:dev
+    deploy:
+      replicas: 2
+      update_config:
+        parallelism: 2
+        order: start-first
+      resources:
+        limits:
+          cpus: '0.50'
+    ports:
+      - 3000:3000
+    labels:
+      - visualizer.autoscale.min=2
+      - visualizer.autoscale.max=5
+      - visualizer.autoscale.up.cpu=0.20
+      - visualizer.autoscale.down.cpu=0.10
+      - visualizer.autoupdate=true
+
+docker stack deploy -c tools.stack.yml tool
+
